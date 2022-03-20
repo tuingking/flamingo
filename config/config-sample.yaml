@@ -1,0 +1,15 @@
+# NOTE: use lowercase
+
+httpserver:
+  port: ":8080"
+  readtimeout: "10s"
+  writetimeout: "10s"
+
+mysql:
+  username: "root"
+  password: "password"
+  host: "localhost"
+  port: "3306"
+  dbname: "playground"
+  maxopenconn: 100
+  maxidleconn: 4
