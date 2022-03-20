@@ -39,7 +39,8 @@ type Config struct {
 	MaxIdleConn int
 }
 
-func Init(cfg Config) MySQL {
+// New create new MySQL instance
+func New(cfg Config) MySQL {
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName))
 	if err != nil {
 		panic(err.Error())

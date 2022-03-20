@@ -1,28 +1,14 @@
-package product
+package rest
 
 import (
 	"net/http"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/pkg/errors"
-	"github.com/tuingking/flamingo/infra/logger"
-	"github.com/tuingking/flamingo/internal/apis"
 )
 
-type API struct {
-	logger  logger.Logger
-	product Service
-}
-
-func NewAPI(logger logger.Logger, product Service) API {
-	return API{
-		logger:  logger,
-		product: product,
-	}
-}
-
-func (a *API) GetAllProducts(w http.ResponseWriter, r *http.Request) {
-	var resp apis.Response
+func (a *RestHandler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
+	var resp Response
 	defer resp.Render(w, r)
 
 	//*** How to get chi requestID

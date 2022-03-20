@@ -1,5 +1,7 @@
 # NOTE: use lowercase
 
+env: "local"
+
 httpserver:
   port: ":8080"
   readtimeout: "10s"

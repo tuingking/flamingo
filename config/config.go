@@ -2,22 +2,27 @@ package config
 
 import (
 	"io/ioutil"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/tuingking/flamingo/infra/httpserver"
+	"github.com/tuingking/flamingo/infra/logger"
 	"github.com/tuingking/flamingo/infra/mysql"
 	"gopkg.in/yaml.v2"
 )
 
-type Config struct {
-	HttpServer struct {
-		Port         string
-		ReadTimeout  time.Duration
-		WriteTimeout time.Duration
-	}
+const (
+	ProductionEnv = "production"
+	LocalEnv      = "local"
+)
 
-	MySQL mysql.Config
+type Config struct {
+	Env string
+
+	// Infra
+	Logger     logger.Config
+	HttpServer httpserver.Config
+	MySQL      mysql.Config
 }
 
 func Init(file string) Config {

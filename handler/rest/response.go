@@ -1,4 +1,4 @@
-package apis
+package rest
 
 import (
 	"net/http"

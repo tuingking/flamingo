@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"os"
 	"runtime"
 
 	"github.com/sirupsen/logrus"
@@ -19,9 +20,45 @@ type logger struct {
 	log *logrus.Logger
 }
 
-func New() Logger {
+type Config struct {
+	Format string
+	Level  string
+}
+
+func New(cfg Config) Logger {
+	log := logrus.New()
+	log.SetOutput(os.Stdout)
+
+	// formatter
+	switch cfg.Format {
+	case "json":
+		log.SetFormatter(&logrus.JSONFormatter{})
+	default:
+		log.SetFormatter(&logrus.TextFormatter{})
+	}
+
+	// level
+	switch cfg.Level {
+	case "panic":
+		log.SetLevel(logrus.PanicLevel)
+	case "fatal":
+		log.SetLevel(logrus.FatalLevel)
+	case "error":
+		log.SetLevel(logrus.ErrorLevel)
+	case "warn":
+		log.SetLevel(logrus.WarnLevel)
+	case "info":
+		log.SetLevel(logrus.InfoLevel)
+	case "debug":
+		log.SetLevel(logrus.DebugLevel)
+	case "trace":
+		log.SetLevel(logrus.TraceLevel)
+	default:
+		log.SetLevel(logrus.DebugLevel)
+	}
+
 	return &logger{
-		log: logrus.New(),
+		log: log,
 	}
 }
 
