@@ -1,14 +1,14 @@
 package config
 
 import (
-	"io/ioutil"
+	"log"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"github.com/tuingking/flamingo/infra/httpserver"
 	"github.com/tuingking/flamingo/infra/logger"
 	"github.com/tuingking/flamingo/infra/mysql"
-	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -33,22 +33,65 @@ type Metadata struct {
 	CommitHash   string
 }
 
-func Init(file string) Config {
+func Init(opts ...Option) Config {
 	var cfg Config
 
-	f, err := ioutil.ReadFile(file)
-	if err != nil {
-		logrus.Fatal(errors.Wrap(err, "read config file"))
+	// default option
+	opt := &option{
+		configPath: "./config/",
+		configFile: "config",
+		configType: "yaml",
 	}
 
-	err = yaml.Unmarshal(f, &cfg)
-	if err != nil {
-		logrus.Fatal(errors.Wrap(err, "unmarshal yaml"))
+	// override option
+	for _, fn := range opts {
+		fn(opt)
 	}
+
+	v := viper.New()
+	v.AddConfigPath(opt.configPath)
+	v.SetConfigName(opt.configFile)
+	v.SetConfigType(opt.configType)
+
+	if err := v.ReadInConfig(); err != nil {
+		log.Fatal(errors.Wrap(err, "read config"))
+	}
+
+	if err := v.Unmarshal(&cfg); err != nil {
+		log.Fatal(errors.Wrap(err, "unmarshal config"))
+	}
+
+	logrus.Infof("%-7s %s", "Config", "✅")
 
 	return cfg
 }
 
 func (c *Config) SetMetadata(m Metadata) {
 	c.Meta = m
+}
+
+type option struct {
+	configFile string
+	configPath string
+	configType string
+}
+
+type Option func(*option)
+
+func WithConfigFile(configFile string) Option {
+	return func(o *option) {
+		o.configFile = configFile
+	}
+}
+
+func WithConfigPath(configPath string) Option {
+	return func(o *option) {
+		o.configPath = configPath
+	}
+}
+
+func WithConfigType(configType string) Option {
+	return func(o *option) {
+		o.configType = configType
+	}
 }

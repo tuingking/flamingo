@@ -57,6 +57,8 @@ func New(cfg Config) Logger {
 		log.SetLevel(logrus.DebugLevel)
 	}
 
+	logrus.Infof("%-7s %s", "Logger", "✅")
+
 	return &logger{
 		log: log,
 	}

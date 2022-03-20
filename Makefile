@@ -7,7 +7,7 @@ BUILD_VERSION ?= $(shell git describe --tag)
 COMMIT_HASH ?= $(shell git rev-parse --short HEAD)
 
 build:
-	@echo "😎 build app"
+	@echo "📦 building binary..."
 	@go build -ldflags "-X main.Namespace=${NAMESPACE} \
 		-X main.BuildVersion=${BUILD_VERSION} \
 		-X main.BuildTime=${BUILD_TIME} \

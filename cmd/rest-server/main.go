@@ -25,27 +25,33 @@ var (
 )
 
 func main() {
-	// config
-	cfg := config.Init("config/config.yaml")
-	cfg.SetMetadata(config.Metadata{
+	meta := config.Metadata{
 		Namespace:    Namespace,
 		GoVersion:    runtime.Version(),
 		BuildVersion: BuildVersion,
 		BuildTime:    BuildTime,
 		CommitHash:   CommitHash,
-	})
+	}
+
+	// config
+	cfg := config.Init(
+		config.WithConfigFile("config"),
+		config.WithConfigType("yaml"),
+	)
+	cfg.SetMetadata(meta)
 
 	// Infra
 	logger := logger.New(cfg.Logger)
 	sql := mysql.New(cfg.MySQL)
 
 	logger.Infof("Meta: %+v", cfg.Meta)
+	logger.Infof("MySQL: %+v", cfg.MySQL)
 
 	// Domain - Product
 	productRepo := product.NewRepository(sql)
 	productSvc := product.NewService(productRepo)
 
-	// Web
+	// web template
 	tpl := template.Must(template.ParseGlob("web/templates/*"))
 
 	// rest handler

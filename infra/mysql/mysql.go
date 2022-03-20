@@ -7,6 +7,8 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type MySQL interface {
@@ -53,6 +55,12 @@ func New(cfg Config) MySQL {
 	if cfg.MaxIdleConn != 0 {
 		db.SetMaxIdleConns(cfg.MaxIdleConn)
 	}
+
+	if err = db.Ping(); err != nil {
+		logrus.Fatal(errors.Wrap(err, "ping mysql"))
+	}
+
+	logrus.Infof("%-7s %s", "MySQL", "✅")
 
 	return db
 }
