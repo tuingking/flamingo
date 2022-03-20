@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 
 	"github.com/pkg/errors"
@@ -16,13 +17,29 @@ import (
 	"github.com/tuingking/flamingo/internal/product"
 )
 
+var (
+	Namespace    string
+	BuildVersion string
+	BuildTime    string
+	CommitHash   string
+)
+
 func main() {
 	// config
 	cfg := config.Init("config/config.yaml")
+	cfg.SetMetadata(config.Metadata{
+		Namespace:    Namespace,
+		GoVersion:    runtime.Version(),
+		BuildVersion: BuildVersion,
+		BuildTime:    BuildTime,
+		CommitHash:   CommitHash,
+	})
 
 	// Infra
 	logger := logger.New(cfg.Logger)
 	sql := mysql.New(cfg.MySQL)
+
+	logger.Infof("Meta: %+v", cfg.Meta)
 
 	// Domain - Product
 	productRepo := product.NewRepository(sql)

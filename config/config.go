@@ -17,12 +17,20 @@ const (
 )
 
 type Config struct {
-	Env string
+	Meta Metadata
 
 	// Infra
 	Logger     logger.Config
 	HttpServer httpserver.Config
 	MySQL      mysql.Config
+}
+
+type Metadata struct {
+	Namespace    string
+	GoVersion    string
+	BuildVersion string
+	BuildTime    string
+	CommitHash   string
 }
 
 func Init(file string) Config {
@@ -39,4 +47,8 @@ func Init(file string) Config {
 	}
 
 	return cfg
+}
+
+func (c *Config) SetMetadata(m Metadata) {
+	c.Meta = m
 }

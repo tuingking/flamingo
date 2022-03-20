@@ -2,6 +2,10 @@
 
 env: "local"
 
+logger:
+  format: "text"
+  level: "debug"
+
 httpserver:
   port: ":8080"
   readtimeout: "10s"
