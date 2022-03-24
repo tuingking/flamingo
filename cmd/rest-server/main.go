@@ -24,6 +24,20 @@ var (
 	CommitHash   string
 )
 
+// @title Swagger Flamingo API
+// @version 1.0
+// @description This is a sample server Petstore server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /api
 func main() {
 	meta := config.Metadata{
 		Namespace:    Namespace,
@@ -49,7 +63,7 @@ func main() {
 
 	// Domain - Product
 	productRepo := product.NewRepository(sql)
-	productSvc := product.NewService(productRepo)
+	productSvc := product.NewService(cfg.Product.Service, logger, productRepo)
 
 	// web template
 	tpl := template.Must(template.ParseGlob("web/templates/*"))

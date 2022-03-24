@@ -8,6 +8,8 @@ import (
 )
 
 type Logger interface {
+	Debug(args ...interface{})
+	Debugf(format string, args ...interface{})
 	Info(args ...interface{})
 	Infof(format string, args ...interface{})
 	Warn(args ...interface{})
@@ -62,6 +64,14 @@ func New(cfg Config) Logger {
 	return &logger{
 		log: log,
 	}
+}
+
+func (l *logger) Debug(args ...interface{}) {
+	l.log.WithField("goroutines", runtime.NumGoroutine()).Debug(args...)
+}
+
+func (l *logger) Debugf(format string, args ...interface{}) {
+	l.log.WithField("goroutines", runtime.NumGoroutine()).Debugf(format, args...)
 }
 
 func (l *logger) Info(args ...interface{}) {

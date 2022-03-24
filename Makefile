@@ -6,7 +6,10 @@ BUILD_TIME ?= $(shell date -u '+%Y-%m-%d_%H:%M:%S')
 BUILD_VERSION ?= $(shell git describe --tag)
 COMMIT_HASH ?= $(shell git rev-parse --short HEAD)
 
-build:
+swag:
+	@swag init --parseDependency --parseInternal --parseDepth 1 -g cmd/rest-server/main.go
+
+build: swag
 	@echo "📦 building binary..."
 	@go build -ldflags "-X main.Namespace=${NAMESPACE} \
 		-X main.BuildVersion=${BUILD_VERSION} \
@@ -14,6 +17,11 @@ build:
 		-X main.CommitHash=${COMMIT_HASH}" \
 		--race --tags=dynamic -o ./bin/${NAMESPACE}-rest-server cmd/rest-server/main.go
 
-run: build
+kill-process:
+	@lsof -i :8080 | awk '$$1 ~ /app/ { print $$2 }' | xargs kill -9 || true
+
+run: kill-process build
 	@./bin/${NAMESPACE}-rest-server
 	
+run-dev: swag
+	@air cmd/rest-server/main.go

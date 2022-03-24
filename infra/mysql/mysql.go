@@ -32,13 +32,31 @@ type MySQL interface {
 }
 
 type Config struct {
-	Username    string
-	Password    string
-	Host        string
-	Port        string
-	DBName      string
+	Username string
+	Password string
+	Host     string
+	Port     string
+	DBName   string
+
+	// Default is unlimited
+	// set to lest than equal to 0 means make it unlimited or default setting,
+	// more open connection means less time taken to perform query
 	MaxOpenConn int
+
+	// MaxIdleConn default is 2
+	// set to lest than equal to 0 means not allow any idle connection,
+	// more idle connection in the pool will improve performance,
+	// since no need to establish connection from scratch)
+	// by set idle connection to 0, a new connection has to be created from scratch for each operation
+	// ! should be <= MaxOpenConn
 	MaxIdleConn int
+
+	// MaxLifetime set max length of time that a connection can be reused for.
+	// Setting to 0 means that there is no maximum lifetime and
+	// the connection is reused forever (which is the default behavior)
+	// the shorter lifetime result in more memory useage
+	// since it will kill the connection and recreate it
+	MaxLifetime time.Duration
 }
 
 // New create new MySQL instance

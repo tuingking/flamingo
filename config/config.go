@@ -9,6 +9,7 @@ import (
 	"github.com/tuingking/flamingo/infra/httpserver"
 	"github.com/tuingking/flamingo/infra/logger"
 	"github.com/tuingking/flamingo/infra/mysql"
+	"github.com/tuingking/flamingo/internal/product"
 )
 
 const (
@@ -23,6 +24,9 @@ type Config struct {
 	Logger     logger.Config
 	HttpServer httpserver.Config
 	MySQL      mysql.Config
+
+	// Product
+	Product product.Config
 }
 
 type Metadata struct {

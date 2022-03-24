@@ -50,6 +50,8 @@ func (s *httpServer) Close() error {
 
 func (s *httpServer) ListenAndServe() error {
 	s.logger.Info("Server running on port ", s.cfg.Port)
+	s.logger.Info("Read Timeout ", s.cfg.ReadTimeout)
+	s.logger.Info("Write Timeout ", s.cfg.WriteTimeout)
 	return s.server.ListenAndServe()
 }
 
