@@ -7,7 +7,7 @@ BUILD_VERSION ?= $(shell git describe --tag)
 COMMIT_HASH ?= $(shell git rev-parse --short HEAD)
 
 swag:
-	@swag init --parseDependency --parseInternal --parseDepth 1 -g cmd/rest-server/main.go
+	@swag init --parseDependency --parseInternal --parseDepth 1 -g cmd/rest/main.go
 
 build: swag
 	@echo "📦 building binary..."
@@ -15,13 +15,16 @@ build: swag
 		-X main.BuildVersion=${BUILD_VERSION} \
 		-X main.BuildTime=${BUILD_TIME} \
 		-X main.CommitHash=${COMMIT_HASH}" \
-		--race --tags=dynamic -o ./bin/${NAMESPACE}-rest-server cmd/rest-server/main.go
+		--race --tags=dynamic -o ./bin/${NAMESPACE}-rest cmd/rest/main.go
 
 kill-process:
 	@lsof -i :8080 | awk '$$1 ~ /app/ { print $$2 }' | xargs kill -9 || true
 
 run: kill-process build
-	@./bin/${NAMESPACE}-rest-server
+	@./bin/${NAMESPACE}-rest
 	
 run-dev: swag
-	@air cmd/rest-server/main.go
+	@air cmd/rest/main.go
+
+migrate:
+	@migrate -source file://script/migrations -database mysql://root:password@/playground -verbose up

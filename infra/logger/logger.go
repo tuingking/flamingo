@@ -30,6 +30,7 @@ type Config struct {
 func New(cfg Config) Logger {
 	log := logrus.New()
 	log.SetOutput(os.Stdout)
+	// log.SetReportCaller(true)
 
 	// formatter
 	switch cfg.Format {

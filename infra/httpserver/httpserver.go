@@ -29,6 +29,9 @@ type Config struct {
 	Port         string
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
+	TLS          bool
+	CertFile     string
+	KeyFile      string
 }
 
 func New(cfg Config, logger logger.Logger, h http.Handler) HTTPServer {
@@ -52,7 +55,16 @@ func (s *httpServer) ListenAndServe() error {
 	s.logger.Info("Server running on port ", s.cfg.Port)
 	s.logger.Info("Read Timeout ", s.cfg.ReadTimeout)
 	s.logger.Info("Write Timeout ", s.cfg.WriteTimeout)
+
+	if s.cfg.TLS {
+		return s.listenAndServeTLS(s.cfg.CertFile, s.cfg.KeyFile)
+	}
+
 	return s.server.ListenAndServe()
+}
+
+func (s *httpServer) listenAndServeTLS(certFile, keyFile string) error {
+	return s.server.ListenAndServeTLS(certFile, keyFile)
 }
 
 func (s *httpServer) Shutdown(ctx context.Context) error {

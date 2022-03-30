@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/go-chi/render"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // Response defines http response for the client
@@ -27,6 +29,7 @@ type Error struct {
 // SetError set the response to return the given error.
 // code is http status code, http.StatusInternalServerError is the default value
 func (res *Response) SetError(err error, code ...int) {
+	logrus.Error(errors.Wrap(err, "ERR"))
 	res.ServerTime = time.Now().Unix()
 
 	if len(code) > 0 {

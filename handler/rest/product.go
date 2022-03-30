@@ -2,10 +2,13 @@ package rest
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/pkg/errors"
+	"github.com/tuingking/flamingo/infra/contextkey"
+	"github.com/tuingking/flamingo/internal/auth"
 	"github.com/tuingking/flamingo/internal/product"
 )
 
@@ -27,6 +30,14 @@ func (h *RestHandler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	//*** How to get chi requestID
 	requestID := r.Context().Value(middleware.RequestIDKey).(string)
 	h.logger.Info("requestID: ", requestID)
+
+	//** Get Session
+	fmt.Printf("[DEBUG] r.Context().Value(contextkey.Identity): %+v\n", r.Context().Value(contextkey.Identity))
+	identity, ok := r.Context().Value(contextkey.Identity).(auth.JwtClaims)
+	if !ok {
+		h.logger.Warn("unable to get identity")
+	}
+	fmt.Printf("[DEBUG] identity: %+v\n", identity)
 
 	products, err := h.product.GetAllProducts(r.Context())
 	if err != nil {

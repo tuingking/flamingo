@@ -9,6 +9,8 @@ import (
 	"github.com/tuingking/flamingo/infra/httpserver"
 	"github.com/tuingking/flamingo/infra/logger"
 	"github.com/tuingking/flamingo/infra/mysql"
+	"github.com/tuingking/flamingo/internal/account"
+	"github.com/tuingking/flamingo/internal/auth"
 	"github.com/tuingking/flamingo/internal/product"
 )
 
@@ -25,7 +27,9 @@ type Config struct {
 	HttpServer httpserver.Config
 	MySQL      mysql.Config
 
-	// Product
+	// Internal
+	Auth    auth.Config
+	Account account.Config
 	Product product.Config
 }
 
