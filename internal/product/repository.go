@@ -25,7 +25,7 @@ func NewRepository(mysql mysql.MySQL) Repository {
 func (r *repository) FindAll(ctx context.Context) ([]Product, error) {
 	var res []Product
 
-	query := `SELECT id, name FROM product`
+	query := `SELECT id, name FROM product LIMIT 100`
 
 	rows, err := r.mysql.QueryContext(ctx, query)
 	if err != nil {

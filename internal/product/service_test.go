@@ -32,7 +32,7 @@ func setup(t *testing.T) func() {
 	}
 
 	ctrl := gomock.NewController(t)
-	cfg := product.ConfigSvc{Worker: 3}
+	cfg := product.ConfigSvc{}
 	log = logger.New(logger.Config{})
 	mockProductRepo = mockproduct.NewMockRepository(ctrl)
 	productSvc = product.NewService(cfg, log, mockProductRepo)
@@ -47,7 +47,7 @@ func Test_GenerateProducts(t *testing.T) {
 	defer teardown()
 
 	Convey("Given n=10", t, func() {
-		products := productSvc.GenerateProducts(context.Background(), 10)
+		products := productSvc.GenerateRandomProducts(context.Background(), 10)
 		Convey("When generated should return 10 products", func() {
 			So(len(products), ShouldEqual, 10)
 		})
@@ -81,10 +81,10 @@ func Test_GenerateProductsCsv(t *testing.T) {
 
 // }
 
-func Test_BulkCreate(t *testing.T) {
+func Test_Seed(t *testing.T) {
 	teardown := setup(t)
 	defer teardown()
 
 	mockProductRepo.EXPECT().Create(gomock.Any(), gomock.Any()).Return(product.Product{}, nil).AnyTimes()
-	_ = productSvc.BulkCreate(context.Background(), "tmp/products.csv")
+	_ = productSvc.Seed(context.Background(), 100)
 }

@@ -9,7 +9,10 @@ logger:
 httpserver:
   port: ":8080"
   readtimeout: "10s"
-  writetimeout: "10s"
+  writetimeout: "1m"
+  tls: false
+  certfile: "etc/tls-crt/server.crt"
+  keyfile: "etc/tls-crt/server.key"
 
 mysql:
   username: "root"
@@ -17,5 +20,18 @@ mysql:
   host: "localhost"
   port: "3306"
   dbname: "playground"
-  maxopenconn: 100
-  maxidleconn: 4
+  maxopenconn: 0    # default unlimited (set to <=0 means unlimited or default value)
+  maxidleconn: 2    # default 2 (set to <= 0 means not allow any idle connection, more idle connection in the pool will improve performance, since no need to establish connection from scratch)
+
+account:
+  service:
+    jwt:
+      secret: "helloworldnananajohndoemaumakandoeloe"
+      accessexpiresin: "1h"
+      refreshexpiresin: "72h"
+
+apm:
+  servicename: ""
+  serverurl: "http://localhost:8200"
+  secrettoken: ""
+  environment: "local"

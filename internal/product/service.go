@@ -16,14 +16,9 @@ import (
 
 type Service interface {
 	GetAllProducts(ctx context.Context) ([]Product, error)
-
-	GenerateProducts(ctx context.Context, n int64) []Product
-
-	// GenerateProductsCsv create random product and save it as csv file
-	GenerateProductsCsv(ctx context.Context, n int64) (*os.File, error)
-
-	// BulkCreate insert data from the csv to DB using goroutine
-	BulkCreate(ctx context.Context, filename string) error
+	GenerateRandomProducts(ctx context.Context, n int) []Product
+	GenerateProductsCsv(ctx context.Context, n int) (*os.File, error)
+	Seed(ctx context.Context, n int) error
 }
 
 type service struct {
@@ -32,9 +27,7 @@ type service struct {
 	product Repository
 }
 
-type ConfigSvc struct {
-	Worker int
-}
+type ConfigSvc struct{}
 
 func NewService(
 	config ConfigSvc,
@@ -52,15 +45,12 @@ func (s *service) GetAllProducts(ctx context.Context) ([]Product, error) {
 	return s.product.FindAll(ctx)
 }
 
-func (s *service) GenerateProducts(ctx context.Context, n int64) []Product {
+func (s *service) GenerateRandomProducts(ctx context.Context, n int) []Product {
 	var products []Product
 
-	for i := int64(0); i < n; i++ {
-		// g := namegenerator.NewNameGenerator(time.Now().UTC().UnixNano())
-
+	for i := 0; i < n; i++ {
 		product := Product{
-			Name: fmt.Sprintf("Product-%d", i+1),
-			// Name:  g.Generate(),
+			Name:  fmt.Sprintf("Product-%d", i+1),
 			Price: float64(1000 + (i+1)*100),
 		}
 
@@ -70,12 +60,12 @@ func (s *service) GenerateProducts(ctx context.Context, n int64) []Product {
 	return products
 }
 
-func (s *service) GenerateProductsCsv(ctx context.Context, n int64) (*os.File, error) {
+func (s *service) GenerateProductsCsv(ctx context.Context, n int) (*os.File, error) {
 	now := time.Now()
 	defer func() {
 		s.logger.Info("GenerateProductsCsv took ", time.Since(now))
 	}()
-	products := s.GenerateProducts(ctx, n)
+	products := s.GenerateRandomProducts(ctx, n)
 
 	csvfile, err := os.Create("tmp/products.csv")
 	if err != nil {
@@ -93,38 +83,35 @@ func (s *service) GenerateProductsCsv(ctx context.Context, n int64) (*os.File, e
 	return csvfile, nil
 }
 
-// BulkCreate read csv file then insert to BD using worker pool
-func (s *service) BulkCreate(ctx context.Context, filename string) error {
+func (s *service) Seed(ctx context.Context, n int) error {
 	var (
-		totalJobDispatched int
-		totalJobFinished   int
+		totalJobFinished int
 
 		// define channel
 		jobs   = make(chan Product)
 		output = make(chan string)
 		wg     = sync.WaitGroup{}
 		lock   = sync.Mutex{}
-		worker = s.config.Worker
+		worker = 10
 	)
 
-	now := time.Now()
 	defer func() {
-		s.logger.Info("GenerateProductsCsv took ", time.Since(now))
-
-		s.logger.Info("Total Worker: ", worker)
-		s.logger.Info("Total Job: ", totalJobDispatched)
-		lock.Lock()
-		s.logger.Info("Total Done: ", totalJobFinished)
-		if totalJobDispatched == totalJobFinished {
-			s.logger.Info("Job Succesfully Done")
+		s.logger.Warnf("success: %d/%d", totalJobFinished, n)
+		if totalJobFinished != int(n) {
+			failed := n - totalJobFinished
+			s.logger.Warnf("failed: %d", failed)
 		}
-		lock.Unlock()
 	}()
 
-	// open file
-	f, err := os.Open(filename)
+	// generate random product
+	csvf, err := s.GenerateProductsCsv(ctx, n)
 	if err != nil {
-		return errors.Wrap(err, "open file")
+		return errors.Wrap(err, "GenerateProductsCsv")
+	}
+
+	f, err := os.Open(csvf.Name())
+	if err != nil {
+		return errors.Wrap(err, "open csv file")
 	}
 	defer f.Close()
 
@@ -136,11 +123,13 @@ func (s *service) BulkCreate(ctx context.Context, filename string) error {
 	// listen to channel output
 	go func() {
 		for res := range output {
+			if res != "ERR" {
+				lock.Lock()
+				totalJobFinished++
+				lock.Unlock()
+				s.logger.Info(res)
+			}
 			wg.Done()
-			s.logger.Info(res)
-			lock.Lock()
-			totalJobFinished++
-			lock.Unlock()
 		}
 	}()
 
@@ -171,7 +160,6 @@ func (s *service) BulkCreate(ctx context.Context, filename string) error {
 
 		wg.Add(1)
 		jobs <- product // block, need consumer
-		totalJobDispatched++
 	}
 	close(jobs)
 
@@ -184,7 +172,7 @@ func (s *service) workerDispatcher(ctx context.Context, id int, jobs <-chan Prod
 	for product := range jobs {
 		p, err := s.product.Create(ctx, product)
 		if err != nil {
-			s.logger.Error(err, " failed create product")
+			output <- "ERR"
 		}
 		output <- fmt.Sprintf("worker:%d, product %s__%d ✅", id, product.Name, p.ID)
 	}

@@ -36,36 +36,8 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 	return m.recorder
 }
 
-// BulkCreate mocks base method.
-func (m *MockService) BulkCreate(ctx context.Context, filename string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BulkCreate", ctx, filename)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// BulkCreate indicates an expected call of BulkCreate.
-func (mr *MockServiceMockRecorder) BulkCreate(ctx, filename interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreate", reflect.TypeOf((*MockService)(nil).BulkCreate), ctx, filename)
-}
-
-// GenerateProducts mocks base method.
-func (m *MockService) GenerateProducts(ctx context.Context, n int64) []product.Product {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GenerateProducts", ctx, n)
-	ret0, _ := ret[0].([]product.Product)
-	return ret0
-}
-
-// GenerateProducts indicates an expected call of GenerateProducts.
-func (mr *MockServiceMockRecorder) GenerateProducts(ctx, n interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateProducts", reflect.TypeOf((*MockService)(nil).GenerateProducts), ctx, n)
-}
-
 // GenerateProductsCsv mocks base method.
-func (m *MockService) GenerateProductsCsv(ctx context.Context, n int64) (*os.File, error) {
+func (m *MockService) GenerateProductsCsv(ctx context.Context, n int) (*os.File, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GenerateProductsCsv", ctx, n)
 	ret0, _ := ret[0].(*os.File)
@@ -77,6 +49,20 @@ func (m *MockService) GenerateProductsCsv(ctx context.Context, n int64) (*os.Fil
 func (mr *MockServiceMockRecorder) GenerateProductsCsv(ctx, n interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateProductsCsv", reflect.TypeOf((*MockService)(nil).GenerateProductsCsv), ctx, n)
+}
+
+// GenerateRandomProducts mocks base method.
+func (m *MockService) GenerateRandomProducts(ctx context.Context, n int) []product.Product {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenerateRandomProducts", ctx, n)
+	ret0, _ := ret[0].([]product.Product)
+	return ret0
+}
+
+// GenerateRandomProducts indicates an expected call of GenerateRandomProducts.
+func (mr *MockServiceMockRecorder) GenerateRandomProducts(ctx, n interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateRandomProducts", reflect.TypeOf((*MockService)(nil).GenerateRandomProducts), ctx, n)
 }
 
 // GetAllProducts mocks base method.
@@ -92,4 +78,18 @@ func (m *MockService) GetAllProducts(ctx context.Context) ([]product.Product, er
 func (mr *MockServiceMockRecorder) GetAllProducts(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllProducts", reflect.TypeOf((*MockService)(nil).GetAllProducts), ctx)
+}
+
+// Seed mocks base method.
+func (m *MockService) Seed(ctx context.Context, n int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Seed", ctx, n)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Seed indicates an expected call of Seed.
+func (mr *MockServiceMockRecorder) Seed(ctx, n interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Seed", reflect.TypeOf((*MockService)(nil).Seed), ctx, n)
 }

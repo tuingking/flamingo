@@ -1,10 +1,11 @@
 package rest
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/pkg/errors"
 	"github.com/tuingking/flamingo/infra/contextkey"
@@ -28,7 +29,11 @@ func (h *RestHandler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	defer resp.Render(w, r)
 
 	//*** How to get chi requestID
-	requestID := r.Context().Value(middleware.RequestIDKey).(string)
+	requestID, ok := r.Context().Value(middleware.RequestIDKey).(string)
+	if !ok {
+		resp.SetError(errors.New("unable to get request id"), http.StatusInternalServerError)
+		return
+	}
 	h.logger.Info("requestID: ", requestID)
 
 	//** Get Session
@@ -49,40 +54,30 @@ func (h *RestHandler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	resp.Data = respData
 }
 
-// GetAllProducts
-// @Summary get all products
-// @Description get all products
+// Seed Product
+// @Summary auto generate random product and populate it to database
+// @Description auto generate random product and populate it to database
 // @Tags Product
 // @Accept json
 // @Produce json
-// @Param paramName query string true "my param"
+// @Param n path integer true "number product are going to be generated"
 // @Success 200 {object} Response{} "Success Response"
 // @Failure 400 "Bad Request"
 // @Failure 500 "InternalServerError"
-// @Router /products/bulk [post]
-func (h *RestHandler) BulkCreate(w http.ResponseWriter, r *http.Request) {
+// @Router /products/seed/{n} [post]
+func (h *RestHandler) SeedProduct(w http.ResponseWriter, r *http.Request) {
 	var resp Response
 	defer resp.Render(w, r)
 
-	type request struct {
-		Filename string `json:"filename"`
-	}
-	var req request
-	err := json.NewDecoder(r.Body).Decode(&req)
+	n, err := strconv.Atoi(chi.URLParam(r, "n"))
 	if err != nil {
-		resp.SetError(errors.New("decode request body"), http.StatusBadRequest)
+		resp.SetError(errors.Wrap(err, "n should be a number"), http.StatusInternalServerError)
 		return
 	}
 
-	if req.Filename == "" {
-		resp.SetError(errors.New("filename required"), http.StatusBadRequest)
-		return
-	}
-	h.logger.Info("filename: ", req.Filename)
-
-	err = h.product.BulkCreate(r.Context(), req.Filename)
+	err = h.product.Seed(r.Context(), n)
 	if err != nil {
-		resp.SetError(errors.Wrap(err, "bulk create"), http.StatusInternalServerError)
+		resp.SetError(errors.Wrap(err, "[Seed] error seeding product data"), http.StatusInternalServerError)
 		return
 	}
 

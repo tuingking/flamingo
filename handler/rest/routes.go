@@ -5,13 +5,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	_ "github.com/tuingking/flamingo/docs"
-	flaware "github.com/tuingking/flamingo/handler/rest/middleware"
 )
 
 func NewHttpHandler(h RestHandler) http.Handler {
@@ -54,12 +53,12 @@ func privateRoute(h RestHandler) http.Handler {
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
 	}))
-	r.Use(flaware.Satpam(h.auth))
+	// r.Use(flaware.Satpam(h.auth))
 
 	// API route
 	r.Route("/products", func(r chi.Router) {
 		r.Get("/", h.GetAllProducts)
-		r.Post("/bulk", h.BulkCreate)
+		r.Post("/seed/{n}", h.SeedProduct)
 	})
 
 	return r
