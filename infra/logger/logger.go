@@ -30,14 +30,18 @@ type Config struct {
 func New(cfg Config) Logger {
 	log := logrus.New()
 	log.SetOutput(os.Stdout)
-	// log.SetReportCaller(true)
+	log.SetReportCaller(true)
 
 	// formatter
 	switch cfg.Format {
 	case "json":
 		log.SetFormatter(&logrus.JSONFormatter{})
 	default:
-		log.SetFormatter(&logrus.TextFormatter{})
+		log.SetFormatter(&logrus.TextFormatter{
+			DisableColors:   false,
+			TimestampFormat: "2006-01-02 15:04:05.000",
+			FullTimestamp:   true,
+		})
 	}
 
 	// level

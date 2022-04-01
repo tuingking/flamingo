@@ -88,19 +88,20 @@ func (s *service) Seed(ctx context.Context, n int) error {
 		totalJobFinished int
 
 		// define channel
-		jobs   = make(chan Product)
-		output = make(chan string)
+		worker = 10
+		jobs   = make(chan Product, worker)
+		output = make(chan string, worker)
 		wg     = sync.WaitGroup{}
 		lock   = sync.Mutex{}
-		worker = 10
+
+		now = time.Now()
 	)
 
 	defer func() {
-		s.logger.Warnf("success: %d/%d", totalJobFinished, n)
-		if totalJobFinished != int(n) {
-			failed := n - totalJobFinished
-			s.logger.Warnf("failed: %d", failed)
-		}
+		s.logger.Infof("Seed took: %v s", time.Since(now).Seconds())
+		s.logger.Infof("success: %d/%d", totalJobFinished, n)
+		failed := n - totalJobFinished
+		s.logger.Infof("failed: %d", failed)
 	}()
 
 	// generate random product
@@ -123,7 +124,9 @@ func (s *service) Seed(ctx context.Context, n int) error {
 	// listen to channel output
 	go func() {
 		for res := range output {
-			if res != "ERR" {
+			if res[:3] == "ERR" {
+				s.logger.Errorf(res[4:])
+			} else {
 				lock.Lock()
 				totalJobFinished++
 				lock.Unlock()
@@ -172,8 +175,9 @@ func (s *service) workerDispatcher(ctx context.Context, id int, jobs <-chan Prod
 	for product := range jobs {
 		p, err := s.product.Create(ctx, product)
 		if err != nil {
-			output <- "ERR"
+			output <- fmt.Sprintf("ERR %v", errors.Wrap(err, "create product"))
+			continue
 		}
-		output <- fmt.Sprintf("worker:%d, product %s__%d ✅", id, product.Name, p.ID)
+		output <- fmt.Sprintf("worker:%d, %s__%d ✅", id, product.Name, p.ID)
 	}
 }

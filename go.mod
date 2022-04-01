@@ -17,6 +17,7 @@ require (
 )
 
 require (
+	github.com/eapache/go-resiliency v1.2.0
 	github.com/go-chi/cors v1.2.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.1.2

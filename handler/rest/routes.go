@@ -48,6 +48,7 @@ func privateRoute(h RestHandler) http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
+	// r.Use(panics.HTTPRecoveryMiddleware)
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH"},

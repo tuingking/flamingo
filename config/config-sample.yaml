@@ -3,13 +3,13 @@
 env: "local"
 
 logger:
-  format: "text"
-  level: "debug"
+  format: "json"
+  level: "info"
 
 httpserver:
   port: ":8080"
   readtimeout: "10s"
-  writetimeout: "1m"
+  writetimeout: "20s"
   tls: false
   certfile: "etc/tls-crt/server.crt"
   keyfile: "etc/tls-crt/server.key"

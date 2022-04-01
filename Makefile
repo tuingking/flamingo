@@ -28,3 +28,11 @@ run-dev: swag
 
 migrate:
 	@migrate -source file://script/migrations -database mysql://root:password@/playground -verbose up
+
+build-image:
+	@ echo "📦 building docker image..."
+	@ docker build -f Dockerfile -t flamingo .
+
+docker-run:
+	@ echo "📦 run container..."
+	@ docker run --name flamingo -p 8080:8080 flamingo
