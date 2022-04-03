@@ -16,6 +16,8 @@ type Logger interface {
 	Warnf(format string, args ...interface{})
 	Error(args ...interface{})
 	Errorf(format string, args ...interface{})
+	Fatal(args ...interface{})
+	Fatalf(format string, args ...interface{})
 }
 
 type logger struct {
@@ -30,7 +32,7 @@ type Config struct {
 func New(cfg Config) Logger {
 	log := logrus.New()
 	log.SetOutput(os.Stdout)
-	log.SetReportCaller(true)
+	log.SetReportCaller(false)
 
 	// formatter
 	switch cfg.Format {
@@ -101,4 +103,12 @@ func (l *logger) Error(args ...interface{}) {
 
 func (l *logger) Errorf(format string, args ...interface{}) {
 	l.log.WithField("goroutines", runtime.NumGoroutine()).Errorf(format, args...)
+}
+
+func (l *logger) Fatal(args ...interface{}) {
+	l.log.WithField("goroutines", runtime.NumGoroutine()).Fatal(args...)
+}
+
+func (l *logger) Fatalf(format string, args ...interface{}) {
+	l.log.WithField("goroutines", runtime.NumGoroutine()).Fatalf(format, args...)
 }

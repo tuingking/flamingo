@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  # flamingo uses image that's built from the Dockerfile
+  flamingo:
+    build: .
+    restart: always # untuk retry ketika database first load
+    tty: true
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "mariadb"
+  mariadb:
+    image: "mariadb:latest"
+    restart: always
+    ports:
+      - "3307:3306"
+    command: --init-file /docker-entrypoint-initdb.d/init.sql
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ~/dockervol/mysql:/var/lib/mysql
+    environment:
+      - MARIADB_ROOT_PASSWORD=password
+  

@@ -27,7 +27,7 @@ run-dev: swag
 	@air cmd/rest/main.go
 
 migrate:
-	@migrate -source file://script/migrations -database mysql://root:password@/playground -verbose up
+	@migrate -path script/migrations -database "mysql://root:password@tcp(localhost:3306)/playground" -verbose up
 
 build-image:
 	@ echo "📦 building docker image..."
@@ -35,4 +35,4 @@ build-image:
 
 docker-run:
 	@ echo "📦 run container..."
-	@ docker run --name flamingo -p 8080:8080 flamingo
+	@ docker run --rm --name flamingo -p 8080:8080 flamingo

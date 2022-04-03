@@ -31,8 +31,11 @@ RUN apk add --no-cache ca-certificates
 COPY --from=builder /app/flamingo /flamingo
 
 # Copy all necessary config files
-COPY --from=builder /app/config/config-sample.yaml /config/config-sample.yaml
-RUN sed 's/host: "localhost"/host: "host.docker.internal"/g' /config/config-sample.yaml > /config/config.yaml
+COPY --from=builder /app/config/config-docker.yaml /config/config.yaml
+
+# If using local database uncomment below
+# COPY --from=builder /app/config/config-sample.yaml /config/config-sample.yaml
+# RUN sed 's/host: "localhost"/host: "host.docker.internal"/g' /config/config-sample.yaml > /config/config.yaml
 
 # Copy web related files
 COPY --from=builder /app/web /web

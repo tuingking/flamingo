@@ -3,13 +3,13 @@
 env: "local"
 
 logger:
-  format: "json"
-  level: "info"
+  format: "text"
+  level: "debug"
 
 httpserver:
   port: ":8080"
   readtimeout: "10s"
-  writetimeout: "20s"
+  writetimeout: "30s"
   tls: false
   certfile: "etc/tls-crt/server.crt"
   keyfile: "etc/tls-crt/server.key"
@@ -17,8 +17,7 @@ httpserver:
 mysql:
   username: "root"
   password: "password"
-  host: "localhost"
-  port: "3307"
+  hostport: "mariadb"
   dbname: "playground"
   maxopenconn: 0    # default unlimited (set to <=0 means unlimited or default value)
   maxidleconn: 2    # default 2 (set to <= 0 means not allow any idle connection, more idle connection in the pool will improve performance, since no need to establish connection from scratch)

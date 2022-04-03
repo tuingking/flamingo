@@ -34,8 +34,7 @@ type MySQL interface {
 type Config struct {
 	Username string
 	Password string
-	Host     string
-	Port     string
+	HostPort string
 	DBName   string
 
 	// Default is unlimited
@@ -61,7 +60,10 @@ type Config struct {
 
 // New create new MySQL instance
 func New(cfg Config) MySQL {
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName))
+	connectionstr := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", cfg.Username, cfg.Password, cfg.HostPort, cfg.DBName)
+	logrus.Infof("connectionstr: %s", connectionstr)
+
+	db, err := sql.Open("mysql", connectionstr)
 	if err != nil {
 		panic(err.Error())
 	}

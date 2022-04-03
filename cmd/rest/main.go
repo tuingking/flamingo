@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"html/template"
+	"net/http"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/tuingking/flamingo/config"
@@ -98,15 +100,18 @@ func main() {
 		// waiting for os signal
 		<-quit
 
-		logger.Info("server shutdown gracefully")
-		if err := server.Shutdown(context.Background()); err != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		if err := server.Shutdown(ctx); err != nil {
 			logger.Error(errors.Wrap(err, "failed to shutdown server"))
 		}
+		logger.Info("server shutdown gracefully 😁")
 	}()
 
 	// serve
-	if err := server.ListenAndServe(); err != nil {
-		panic(err)
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		logger.Fatal(errors.Wrap(err, "ListenAndServe"))
 	}
 
 	logger.Info("bye bye 👋👋")
