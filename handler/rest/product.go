@@ -44,7 +44,7 @@ func (h *RestHandler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Printf("[DEBUG] identity: %+v\n", identity)
 
-	products, err := h.product.GetAllProducts(r.Context())
+	products, pagination, err := h.product.GetProducts(r.Context(), product.GetProductParam{})
 	if err != nil {
 		resp.SetError(errors.Wrap(err, "get all products"), http.StatusInternalServerError)
 		return
@@ -52,6 +52,7 @@ func (h *RestHandler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	var respData []product.Product = products
 
 	resp.Data = respData
+	resp.Pagination = pagination
 }
 
 // Seed Product

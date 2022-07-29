@@ -18,6 +18,9 @@ func NewHttpHandler(h RestHandler) http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
+	// pprof
+	r.Mount("/debug", middleware.Profiler())
+
 	// health
 	r.Route("/application", func(r chi.Router) {
 		r.Get("/health", h.Health)

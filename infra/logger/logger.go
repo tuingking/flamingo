@@ -2,7 +2,6 @@ package logger
 
 import (
 	"os"
-	"runtime"
 
 	"github.com/sirupsen/logrus"
 )
@@ -74,41 +73,41 @@ func New(cfg Config) Logger {
 }
 
 func (l *logger) Debug(args ...interface{}) {
-	l.log.WithField("goroutines", runtime.NumGoroutine()).Debug(args...)
+	l.log.Debug(args...)
 }
 
 func (l *logger) Debugf(format string, args ...interface{}) {
-	l.log.WithField("goroutines", runtime.NumGoroutine()).Debugf(format, args...)
+	l.log.Debugf(format, args...)
 }
 
 func (l *logger) Info(args ...interface{}) {
-	l.log.WithField("goroutines", runtime.NumGoroutine()).Info(args...)
+	l.log.Info(args...)
 }
 
 func (l *logger) Infof(format string, args ...interface{}) {
-	l.log.WithField("goroutines", runtime.NumGoroutine()).Infof(format, args...)
+	l.log.Infof(format, args...)
 }
 
 func (l *logger) Warn(args ...interface{}) {
-	l.log.WithField("goroutines", runtime.NumGoroutine()).Warn(args...)
+	l.log.Warn(args...)
 }
 
 func (l *logger) Warnf(format string, args ...interface{}) {
-	l.log.WithField("goroutines", runtime.NumGoroutine()).Warnf(format, args...)
+	l.log.Warnf(format, args...)
 }
 
 func (l *logger) Error(args ...interface{}) {
-	l.log.WithField("goroutines", runtime.NumGoroutine()).Error(args...)
+	l.log.Error(args...)
 }
 
 func (l *logger) Errorf(format string, args ...interface{}) {
-	l.log.WithField("goroutines", runtime.NumGoroutine()).Errorf(format, args...)
+	l.log.Errorf(format, args...)
 }
 
 func (l *logger) Fatal(args ...interface{}) {
-	l.log.WithField("goroutines", runtime.NumGoroutine()).Fatal(args...)
+	l.log.Fatal(args...)
 }
 
 func (l *logger) Fatalf(format string, args ...interface{}) {
-	l.log.WithField("goroutines", runtime.NumGoroutine()).Fatalf(format, args...)
+	l.log.Fatalf(format, args...)
 }

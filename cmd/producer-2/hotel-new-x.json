@@ -1,0 +1,29 @@
+{
+    "id": "5b7676f525a8fa3b9b611918",
+    "hotelId": "3f2345ee-31d3-4d4f-b878-ffb590572943",
+    "publicId": "louis-kienne-hotel-pandanaran-108001534490357400",
+    "name": "Louis Kienne Hotel Pandanaran HOHO-123",
+    "aliasName": [],
+    "starRating": 4.0,
+    "country": {
+        "id": "indonesia",
+        "name": {
+            "en": "Indonesia",
+            "id": "Indonesia",
+            "cn": "印度尼西亚"
+        }
+    },
+    "weightValue": 35196.0,
+    "isActive": 1,
+    "isDeleted": 0,
+    "version": 686,
+    "images": [
+        {
+            "alternativeText": "Bedroom",
+            "originUrl": "http://pix6.agoda.net/hotelImages/163/1636197/1636197_16121615520049728240.jpg?s\u003d312x",
+            "url": "https://s-gk.tiket.photos/t/01E25EBZS3W0FY9GTG6C42E1SE/t_htl-dskt/tix-hotel/images-web/2021/06/04/30267544-0ed2-4855-98ff-200eb95fa0a6-1622814944815-78abe7352edb274167cf80936b1467be.jpg",
+            "mobileUrl": "https://s-gk.tiket.photos/t/01E25EBZS3W0FY9GTG6C42E1SE/t_htl-mble/tix-hotel/images-web/2021/06/04/30267544-0ed2-4855-98ff-200eb95fa0a6-1622814944815-78abe7352edb274167cf80936b1467be.jpg",
+            "orderNumber": 0
+        }
+    ]
+}

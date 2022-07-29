@@ -1,0 +1,20 @@
+{
+    "id": "5b7676f525a8fa3b9b611918",
+    "hotelId": "3f2345ee-31d3-4d4f-b878-ffb590572943",
+    "publicId": "louis-kienne-hotel-pandanaran-108001534490357400",
+    "name": "Louis Kienne Hotel Pandanaran",
+    "aliasName": [],
+    "starRating": 4.0,
+    "country": {
+        "id": "indonesia",
+        "name": {
+            "en": "Indonesia",
+            "id": "Indonesia",
+            "cn": "印度尼西亚"
+        }
+    },
+    "weightValue": 35196.0,
+    "isActive": 1,
+    "isDeleted": 1,
+    "version": 686
+}

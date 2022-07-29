@@ -5,31 +5,42 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/tuingking/flamingo/infra/mysql"
+	"github.com/tuingking/flamingo/infra/qbuilder"
+	"github.com/tuingking/flamingo/infra/sqlgorm"
+	"github.com/tuingking/flamingo/internal/app"
 )
 
 type Repository interface {
-	FindAll(ctx context.Context) ([]Product, error)
+	FindAll(ctx context.Context, p GetProductParam) ([]Product, app.Pagination, error)
 	Create(ctx context.Context, v Product) (Product, error)
 }
 
 type repository struct {
-	mysql mysql.MySQL
+	mysql  mysql.MySQL
+	gormdb sqlgorm.SQLGorm
 }
 
-func NewRepository(mysql mysql.MySQL) Repository {
+func NewRepository(mysql mysql.MySQL, gormdb sqlgorm.SQLGorm) Repository {
 	return &repository{
-		mysql: mysql,
+		mysql:  mysql,
+		gormdb: gormdb,
 	}
 }
 
-func (r *repository) FindAll(ctx context.Context) ([]Product, error) {
-	var res []Product
+func (r *repository) FindAll(ctx context.Context, p GetProductParam) (res []Product, pagination app.Pagination, err error) {
+	// set default pagination
+	p.Page, p.Limit = qbuilder.ValidatePageAndLimit(p.Page, p.Limit)
 
-	query := `SELECT id, name FROM product LIMIT 100`
+	query := `SELECT id, name FROM product`
 
-	rows, err := r.mysql.QueryContext(ctx, query)
+	wc, args, err := qbuilder.New().Build(&p)
 	if err != nil {
-		return res, errors.Wrap(err, "exec query")
+		return res, pagination, errors.Wrap(err, "build qbuilder")
+	}
+
+	rows, err := r.mysql.QueryContext(ctx, query+wc, args...)
+	if err != nil {
+		return res, pagination, errors.Wrap(err, "exec query")
 	}
 	defer rows.Close()
 
@@ -39,31 +50,24 @@ func (r *repository) FindAll(ctx context.Context) ([]Product, error) {
 			&v.ID,
 			&v.Name,
 		); err != nil {
-			return res, errors.Wrap(err, "row scan")
+			return res, pagination, errors.Wrap(err, "row scan")
 		}
 
 		res = append(res, v)
 	}
 
-	return res, nil
+	// pagination
+	pagination.CurrentPage = p.Page
+	pagination.PageSize = p.Limit
+	pagination.TotalElement = int64(len(res))
+
+	return res, pagination, nil
 }
 
 func (r *repository) Create(ctx context.Context, v Product) (Product, error) {
-	// dbStat := r.mysql.Stats()
-	// now := time.Now()
-	// defer func() {
-	// 	logrus.WithFields(logrus.Fields{
-	// 		"MaxOpenConnections": dbStat.MaxOpenConnections,
-	// 		"OpenConnections":    dbStat.OpenConnections,
-	// 		"InUse":              dbStat.InUse,
-	// 		"Idle":               dbStat.Idle,
-	// 		"Elapsed":            time.Since(now),
-	// 	}).Info(v.Name)
-	// }()
-
 	query := `INSERT INTO product(name, price) VALUES(?,?)`
 
-	res, err := r.mysql.ExecContext(ctx, query, v.Name, v.Price)
+	res, err := r.mysql.ExecContext(ctx, query, v.Name, v.BuyPrice)
 	if err != nil {
 		return v, errors.Wrap(err, "exec query")
 	}

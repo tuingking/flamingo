@@ -15,7 +15,7 @@ build: swag
 		-X main.BuildVersion=${BUILD_VERSION} \
 		-X main.BuildTime=${BUILD_TIME} \
 		-X main.CommitHash=${COMMIT_HASH}" \
-		--race --tags=dynamic -o ./bin/${NAMESPACE}-rest cmd/rest/main.go
+		-race --tags=dynamic -o ./bin/${NAMESPACE}-rest cmd/rest/main.go
 
 kill-process:
 	@lsof -i :8080 | awk '$$1 ~ /app/ { print $$2 }' | xargs kill -9 || true

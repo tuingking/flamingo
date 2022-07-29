@@ -7,16 +7,17 @@ import (
 	"github.com/go-chi/render"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/tuingking/flamingo/internal/app"
 )
 
 // Response defines http response for the client
 type Response struct {
-	Code       int         `json:"code"`
-	Data       interface{} `json:"data,omitempty"`
-	Error      Error       `json:"error"`
-	Message    string      `json:"message"`
-	ServerTime int64       `json:"serverTime"`
-	Pagination interface{} `json:"pagination,omitempty"`
+	Code       int            `json:"code"`
+	Data       interface{}    `json:"data,omitempty"`
+	Error      Error          `json:"error"`
+	Message    string         `json:"message"`
+	ServerTime int64          `json:"serverTime"`
+	Pagination app.Pagination `json:"pagination,omitempty"`
 }
 
 // Error defines the error

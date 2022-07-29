@@ -31,7 +31,7 @@ func main() {
 
 func spam(n int64) {
 	w := kafka.NewWriter(kafka.WriterConfig{
-		Brokers:  []string{"localhost:9092"},
+		Brokers:  []string{"localhost:9093"},
 		Topic:    topic,
 		Balancer: &kafka.Hash{},
 		// Balancer: &kafka.LeastBytes{},

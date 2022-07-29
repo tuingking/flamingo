@@ -16,6 +16,7 @@ import (
 	"github.com/tuingking/flamingo/infra/httpserver"
 	"github.com/tuingking/flamingo/infra/logger"
 	"github.com/tuingking/flamingo/infra/mysql"
+	"github.com/tuingking/flamingo/infra/sqlgorm"
 	"github.com/tuingking/flamingo/internal/account"
 	"github.com/tuingking/flamingo/internal/auth"
 	"github.com/tuingking/flamingo/internal/product"
@@ -53,25 +54,23 @@ func main() {
 
 	// config
 	cfg := config.Init(
-		config.WithConfigFile("config"),
-		config.WithConfigType("yaml"),
+	// config.WithConfigFile("config"),
+	// config.WithConfigType("yaml"),
 	)
 	cfg.SetMetadata(meta)
 
 	// Infra
 	logger := logger.New(cfg.Logger)
 	sql := mysql.New(cfg.MySQL)
+	grm := sqlgorm.New(cfg.SQLGorm)
 
 	logger.Infof("Meta: %+v", cfg.Meta)
 	logger.Infof("MySQL: %+v", cfg.MySQL)
 
-	// Auth
 	authSvc := auth.NewService(cfg.Auth, logger)
-	// Account
 	accountRepo := account.NewRepository(sql)
 	accountSvc := account.NewService(cfg.Account, logger, accountRepo)
-	// Product
-	productRepo := product.NewRepository(sql)
+	productRepo := product.NewRepository(sql, grm)
 	productSvc := product.NewService(cfg.Product.Service, logger, productRepo)
 
 	// web template

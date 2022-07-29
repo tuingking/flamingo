@@ -9,6 +9,7 @@ import (
 	"github.com/tuingking/flamingo/infra/httpserver"
 	"github.com/tuingking/flamingo/infra/logger"
 	"github.com/tuingking/flamingo/infra/mysql"
+	"github.com/tuingking/flamingo/infra/sqlgorm"
 	"github.com/tuingking/flamingo/internal/account"
 	"github.com/tuingking/flamingo/internal/auth"
 	"github.com/tuingking/flamingo/internal/product"
@@ -26,6 +27,7 @@ type Config struct {
 	Logger     logger.Config
 	HttpServer httpserver.Config
 	MySQL      mysql.Config
+	SQLGorm    sqlgorm.Config
 
 	// Internal
 	Auth    auth.Config

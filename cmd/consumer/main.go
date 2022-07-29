@@ -24,10 +24,10 @@ func main() {
 		wg.Done()
 	}()
 
-	go func() {
-		consumer2(topic)
-		wg.Done()
-	}()
+	// go func() {
+	// 	consumer2(topic)
+	// 	wg.Done()
+	// }()
 
 	// go func() {
 	// 	consumer3(topic)
@@ -45,7 +45,7 @@ func main() {
 func consumer1(topic string) {
 	logrus.Info("Start Consumer 1")
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers: []string{"localhost:9092"},
+		Brokers: []string{"localhost:9093"},
 		GroupID: "shipping",
 		Topic:   topic,
 		// Partition:   0,
@@ -62,8 +62,8 @@ func consumer1(topic string) {
 			break
 		}
 
-		logrus.Infof("[CONSUMER-02] GroupID: %v, GroupTopic: %v", r.Config().GroupID, r.Config().GroupTopics)
-		logrus.Infof("[CONSUMER-02] Lag: %v", r.Stats().Lag)
+		logrus.Infof("[CONSUMER-01] GroupID: %v, GroupTopic: %v", r.Config().GroupID, r.Config().GroupTopics)
+		logrus.Infof("[CONSUMER-01] Lag: %v", r.Stats().Lag)
 		logrus.Infof("[CONSUMER-01] p:%v offset:%v key:%s val:%s\n", m.Partition, m.Offset, string(m.Key), string(m.Value))
 	}
 

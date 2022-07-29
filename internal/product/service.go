@@ -2,6 +2,7 @@ package product
 
 import (
 	"context"
+	"database/sql"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -12,10 +13,11 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/tuingking/flamingo/infra/logger"
+	"github.com/tuingking/flamingo/internal/app"
 )
 
 type Service interface {
-	GetAllProducts(ctx context.Context) ([]Product, error)
+	GetProducts(ctx context.Context, p GetProductParam) ([]Product, app.Pagination, error)
 	GenerateRandomProducts(ctx context.Context, n int) []Product
 	GenerateProductsCsv(ctx context.Context, n int) (*os.File, error)
 	Seed(ctx context.Context, n int) error
@@ -41,8 +43,8 @@ func NewService(
 	}
 }
 
-func (s *service) GetAllProducts(ctx context.Context) ([]Product, error) {
-	return s.product.FindAll(ctx)
+func (s *service) GetProducts(ctx context.Context, p GetProductParam) ([]Product, app.Pagination, error) {
+	return s.product.FindAll(ctx, p)
 }
 
 func (s *service) GenerateRandomProducts(ctx context.Context, n int) []Product {
@@ -50,8 +52,14 @@ func (s *service) GenerateRandomProducts(ctx context.Context, n int) []Product {
 
 	for i := 0; i < n; i++ {
 		product := Product{
-			Name:  fmt.Sprintf("Product-%d", i+1),
-			Price: float64(1000 + (i+1)*100),
+			Barcode:   sql.NullString{Valid: true, String: "Barcode-" + strconv.Itoa(i)},
+			Name:      "Product-" + strconv.Itoa(i),
+			Slug:      "Slug-" + strconv.Itoa(i),
+			ImageURL:  "",
+			BuyPrice:  float64(1000 + (i+1)*100),
+			SellPrice: float64(1000 + (i+1)*100),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		}
 
 		products = append(products, product)
@@ -76,9 +84,21 @@ func (s *service) GenerateProductsCsv(ctx context.Context, n int) (*os.File, err
 
 	csvwritter := csv.NewWriter(csvfile)
 	for i, product := range products {
-		_ = csvwritter.Write([]string{fmt.Sprintf("%d", i), product.Name, fmt.Sprintf("%f", product.Price)})
+		_ = csvwritter.Write([]string{
+			fmt.Sprintf("%d", i),
+			product.Barcode.String,
+			product.Name,
+			product.Slug,
+			product.ImageURL,
+			fmt.Sprintf("%f", product.BuyPrice),
+			fmt.Sprintf("%f", product.SellPrice),
+			product.CreatedAt.Format("2006-01-02 00:00:00"),
+			product.UpdatedAt.Format("2006-01-02 00:00:00"),
+		})
 	}
 	csvwritter.Flush()
+
+	s.logger.Infof("file create at %s", csvfile.Name())
 
 	return csvfile, nil
 }
@@ -150,15 +170,24 @@ func (s *service) Seed(ctx context.Context, n int) error {
 
 		totalRows++
 
-		price, err := strconv.ParseFloat(row[2], 64)
+		buyprice, err := strconv.ParseFloat(row[5], 64)
 		if err != nil {
-			s.logger.Error(errors.Wrap(err, "parse price to float"))
-			return errors.Wrap(err, "parse price to float")
+			s.logger.Error(errors.Wrap(err, "parse buy price to float"))
+			return errors.Wrap(err, "parse buy price to float")
+		}
+		sellprice, err := strconv.ParseFloat(row[6], 64)
+		if err != nil {
+			s.logger.Error(errors.Wrap(err, "parse sellprice to float"))
+			return errors.Wrap(err, "parse sellprice to float")
 		}
 
 		product := Product{
-			Name:  row[1],
-			Price: price,
+			Barcode:   sql.NullString{Valid: true, String: row[1]},
+			Name:      row[2],
+			Slug:      row[3],
+			ImageURL:  row[4],
+			BuyPrice:  buyprice,
+			SellPrice: sellprice,
 		}
 
 		wg.Add(1)
